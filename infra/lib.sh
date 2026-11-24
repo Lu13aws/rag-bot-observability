@@ -34,9 +34,10 @@ GLUE_JOB="rag-query-log-json-to-parquet"
 RENDER_DIR="infra/.rendered"  # git-ignored; holds templates with real values
 mkdir -p "$RENDER_DIR"
 
-# Print a command, then run it (unless DRY_RUN=1).
+# Print a command (to stderr, so callers can capture stdout), then run it
+# (unless DRY_RUN=1).
 run() {
-  echo "+ $*"
+  echo "+ $*" >&2
   if [[ "$DRY_RUN" == "1" ]]; then
     return 0
   fi
