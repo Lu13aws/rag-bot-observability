@@ -2,6 +2,9 @@
 # Step 3.3: IAM role for the Glue job (least privilege).
 # - AWSGlueServiceRole: Glue core permissions incl. its CloudWatch log groups
 # - Inline policy: read raw/ and scripts/, write processed/ in the project bucket only
+# Trade-off: s3:ListBucket is allowed on the whole project bucket without a
+# prefix condition, because Spark's bucket checks (HeadBucket) carry no prefix
+# and would be denied; listing only reveals object names of synthetic data.
 source "$(dirname "$0")/lib.sh"
 
 if aws iam get-role --role-name "$GLUE_ROLE" >/dev/null 2>&1; then
