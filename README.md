@@ -7,11 +7,12 @@ Requirements-first KPI monitoring for a RAG assistant on AWS: S3, Glue, Athena a
 ## Goal
 Show how business needs for an AI bot are turned into clear reporting
 requirements, a KPI catalog and management dashboards. The monitored
-system is my own RAG knowledge platform [link].
+system is a fictional RAG assistant inspired by my own RAG platform [link].
+All data is synthetic.
 
 ## Approach
 1. Requirements and stakeholder needs: `docs/01-requirements.md`
-2. KPI definitions: `docs/02-kpi-katalog.md`
+2. KPI definitions: `docs/02-kpi-catalog.md`
 3. Data pipeline: logs -> S3 -> Glue -> Athena
 4. Dashboards in Amazon QuickSight
 5. Validation and acceptance testing
@@ -21,11 +22,11 @@ system is my own RAG knowledge platform [link].
 
 ## Planned KPIs
 Response time (p95), error rate, share of queries without sources,
-user feedback, cost per query.
+positive feedback, feedback rate, cost per query, query volume.
 
 ## Roadmap
 - [x] Requirements and KPI templates
-- [ ] Fill in requirements and KPI targets
+- [x] Fill in requirements and KPI targets
 - [ ] Synthetic sample data
 - [ ] Pipeline (S3, Glue, Athena)
 - [ ] QuickSight dashboard

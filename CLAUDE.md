@@ -27,5 +27,5 @@ QuickSight-Dashboards entstehen. Requirements stehen vor der Technik.
 
 ## Konventionen
 - Parquet/Snappy, Hive-Partitionierung nach Datum
-- KPIs nur über den KPI-Katalog definieren (docs/02-kpi-katalog.md)
+- KPIs nur über den KPI-Katalog definieren (docs/02-kpi-catalog.md)
 - Commit-Messages kurz, im Imperativ, Englisch
