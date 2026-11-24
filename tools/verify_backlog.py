@@ -16,6 +16,8 @@ import sys
 from collections import Counter
 from pathlib import Path
 
+from create_backlog import build_body, normalize  # same body format as the generator
+
 BACKLOG = Path(__file__).resolve().parent / "backlog" / "backlog.json"
 
 
@@ -40,7 +42,7 @@ def main() -> None:
     fields = {it["content"]["number"]: it for it in with_number}
 
     issues = {i["title"]: i for i in gh("issue", "list", "--state", "all", "--limit", "500",
-                                         "--json", "number,title,state,stateReason,milestone,labels")}
+                                         "--json", "number,title,state,stateReason,milestone,labels,body")}
     by_id = {b["id"]: b for b in backlog["issues"]}
     missing = [b["title"] for b in backlog["issues"] if b["title"] not in issues]
     if missing:
@@ -78,6 +80,7 @@ def main() -> None:
             (milestone == b.get("milestone"), "milestone"),
             (item_count[num] == 1, f"project items = {item_count[num]}"),
             (sorted(l["name"] for l in issue["labels"]) == sorted(b["labels"]), "labels"),
+            (normalize(issue.get("body") or "") == normalize(build_body(b, by_id)), "body"),
         ]
         mismatches += [f"#{num} {b['id']}: {what}" for ok, what in checks if not ok]
 

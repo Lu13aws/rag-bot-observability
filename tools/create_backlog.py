@@ -89,6 +89,11 @@ def build_body(item: dict, by_id: dict) -> str:
     return "\n\n".join(parts) + "\n"
 
 
+def normalize(text: str) -> str:
+    """Compare bodies independent of line endings and trailing whitespace."""
+    return text.replace("\r\n", "\n").strip()
+
+
 def content_check(items: list[dict], by_id: dict) -> list[str]:
     patterns = list(FORBIDDEN)
     bucket = bucket_name()
@@ -160,15 +165,23 @@ def main() -> None:
 
     # 3. Issues (matched by title)
     existing = {i["title"]: i for i in gh_json(
-        "issue", "list", "--state", "all", "--limit", "500", "--json", "number,title,state,url")}
+        "issue", "list", "--state", "all", "--limit", "500", "--json", "number,title,state,url,body")}
     print("\n== Issues")
     numbers: dict[str, int] = {}
     for item in items:
         meta = f"[{','.join(item['labels'])}] {item.get('milestone') or '-'} | {item['status']}" \
                f"{' | ' + item['priority'] if item.get('priority') else ''}{' | closed' if item.get('closed') else ''}"
         if item["title"] in existing:
-            numbers[item["id"]] = existing[item["title"]]["number"]
-            print(f"  skip    #{numbers[item['id']]:<4} {item['title']}")
+            num = existing[item["title"]]["number"]
+            numbers[item["id"]] = num
+            body = build_body(item, by_id)
+            if normalize(existing[item["title"]].get("body", "")) != normalize(body):
+                # Keep the issue text in sync with backlog.json (e.g. ticked criteria)
+                print(f"  update  #{num:<4} {item['title']} (body)")
+                if not dry:
+                    gh("issue", "edit", str(num), "--body-file", "-", input_text=body)
+            else:
+                print(f"  skip    #{num:<4} {item['title']}")
             continue
         print(f"  create  {item['title']}  {meta}")
         if dry:
