@@ -1,0 +1,2 @@
+# Time zone database for zoneinfo (Windows ships without one)
+tzdata==2025.2

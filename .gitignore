@@ -1,0 +1,13 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# Secrets and local config
+.env
+*.pem
+
+# Synthetic sample data: only one example day is committed.
+# Regenerate the full set with: python ingestion/generate_sample_logs.py
+sample-data/raw/*
+!sample-data/raw/dt=2026-08-03/

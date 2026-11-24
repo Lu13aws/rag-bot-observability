@@ -54,9 +54,14 @@ based on a single KPI catalog (`docs/02-kpi-catalog.md`).
 
 ## 5. Data sources and assumptions
 
-Source: synthetic query logs from a Python generator (planned).
+Source: synthetic query logs from `ingestion/generate_sample_logs.py`,
+checked by `ingestion/validate_sample_logs.py`.
 
-### 5.1 Data model (design, not yet implemented)
+### 5.1 Data model
+
+Status: the raw layer (JSON Lines, one folder per `dt`) and `model_pricing`
+(CSV) are implemented in `sample-data/`. The Parquet layer is not yet
+implemented.
 
 Table `rag_query_log`: one row per query. Parquet/Snappy, Hive-partitioned
 by `dt`.
@@ -98,6 +103,47 @@ At about 2,000 input and 300 output tokens, a query costs about 0.006 USD
   use Europe/Zurich.
 - A-4: The synthetic data covers 90 days.
 
+### 5.3 Simulation assumptions (sample data generator)
+
+These rules exist only to produce realistic synthetic data. They are not
+requirements for a real system. All values are constants at the top of
+`ingestion/generate_sample_logs.py`.
+
+- **Period and reproducibility:** 2026-08-01 to 2026-10-29 (90 days), seed
+  42. The same seed and period always produce identical files, including
+  `query_id`.
+- **Volume:** about 400 queries per weekday and 80 per weekend day; most
+  queries between 08:00 and 18:00 Europe/Zurich.
+- **Split:** `team_a` 60 %, `team_b` 40 %; `model-small` 70 %,
+  `model-large` 30 %.
+- **Status:** base rates of 0.5 % `error` and 0.3 % `timeout`.
+- **Latency:** lognormal distribution with a median of 3,000 ms
+  (`model-small`) or 4,500 ms (`model-large`). Timeouts are stored with
+  `latency_ms = 30000` (A-2); errors with 200-2,000 ms.
+- **Sources:** `sources_count = 0` for about 6 % of queries, otherwise 1-5.
+- **Tokens:** `tokens_in` grows with `sources_count` (about 500-2,550);
+  `tokens_out` 150-500 for successful queries, 0 for failed ones. Retrieval
+  errors have no tokens and no sources.
+- **Error types:** `llm_api` or `retrieval` for `error`, `llm_timeout` for
+  `timeout`.
+- **Feedback depends on sources:** only successful queries are rated (about
+  8 %). A rating is positive with a probability of 85 % if the answer has
+  sources and 40 % if it has none. This links KPI-03 and KPI-04 on purpose:
+  a knowledge gap also lowers user satisfaction.
+
+**Built-in scenarios** (day 1 = 2026-08-01). They create deliberate target
+breaches, e.g. to test FR-05.
+
+| Scenario | Days | Dates | Effect | Expected breach |
+|---|---|---|---|---|
+| Faulty release | 46-48 | 2026-09-15 to 2026-09-17 | `app_version` 1.1.0 with 5 % `error`; fixed in 1.1.1 from day 49 (1.0.0 before day 46) | KPI-02 |
+| Latency spike | 60-62 | 2026-09-29 to 2026-10-01 | Median latency doubled | KPI-01 |
+| Knowledge gap | 73-79 | 2026-10-12 to 2026-10-18 (ISO week 2026-W42) | `sources_count = 0` for about 25 % of queries | KPI-03, KPI-04 |
+
+The knowledge gap was first planned to start on day 70. It was moved to day
+73 so it covers exactly one ISO week. Otherwise it would be split across two
+weeks, and the weekly KPI-03 might not show the breach in either of them.
+
 ## 6. Out of scope
 
 - Answer quality evaluation (faithfulness, relevance): requires an evaluation
@@ -110,6 +156,11 @@ At about 2,000 input and 300 output tokens, a query costs about 0.006 USD
 - Non-token costs (embeddings, hosting, AWS) in KPI-06.
 
 ## 7. Open points
+
+- Resolved: the first ISO week (2026-W31) contains only two weekend days
+  (157 queries), and KPI-05 breached its target there only because of the
+  low volume. Incomplete edge periods are now excluded from target
+  evaluation (see the general calculation rules in the KPI catalog).
 
 - AWS prices (S3, Glue, Athena, QuickSight incl. reader users for the RLS
   test) are verified before the pipeline is built.

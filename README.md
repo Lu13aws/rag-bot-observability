@@ -27,14 +27,33 @@ positive feedback, feedback rate, cost per query, query volume.
 ## Roadmap
 - [x] Requirements and KPI templates
 - [x] Fill in requirements and KPI targets
-- [ ] Synthetic sample data
+- [x] Synthetic sample data
 - [ ] Pipeline (S3, Glue, Athena)
 - [ ] QuickSight dashboard
 - [ ] Row-level security and refresh
 - [ ] UAT and governance notes
 
 ## Data
-Only synthetic or own test data. No personal data.
+Only synthetic data. No personal data.
+
+### Synthetic sample data
+The generator creates 90 days of query logs (2026-08-01 to 2026-10-29) for
+a fictional RAG assistant, including three built-in incident scenarios
+(see `docs/01-requirements.md`, section 5.3). Only one example day
+(`sample-data/raw/dt=2026-08-03/`) is committed; the full set is
+regenerated from a fixed seed, so it is identical on every machine.
+
+```bash
+python -m venv .venv
+# Windows: .venv\Scripts\activate    macOS/Linux: source .venv/bin/activate
+pip install -r requirements.txt
+
+python ingestion/generate_sample_logs.py   # writes sample-data/raw/dt=*/queries.jsonl
+python ingestion/validate_sample_logs.py   # data checks + KPI results, exit code 1 on failure
+```
+
+Options: `--seed`, `--start`, `--days`, `--out`. Changing them produces a
+different data set.
 
 ## Author
 Luciano Sulaimon, Business Analyst / Requirements Engineer
