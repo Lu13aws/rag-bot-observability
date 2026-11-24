@@ -24,6 +24,9 @@ if [[ "$BUCKET" == *CHANGE-ME* ]]; then
   exit 1
 fi
 export AWS_REGION AWS_DEFAULT_REGION="$AWS_REGION"
+# Git Bash on Windows rewrites arguments starting with "/" into Windows paths
+# (e.g. the log group /aws-glue/jobs/output). Disable that for all AWS calls.
+export MSYS_NO_PATHCONV=1
 
 DRY_RUN="${DRY_RUN:-0}"
 GLUE_ROLE="GlueETLRole-${PROJECT}"
