@@ -48,7 +48,7 @@ based on a single KPI catalog (`docs/02-kpi-catalog.md`).
 |---|---|---|---|
 | NFR-01 | Data freshness | The dashboard contains all queries up to the end of the previous day (Europe/Zurich) by 08:00. | A daily QuickSight dataset refresh is scheduled before 08:00, and the refresh history shows a successful run. Note: demo data is static, so freshness is verified through the refresh schedule, not through new data. |
 | NFR-02 | Access control (RLS) | Row-level security on `user_group`: Team A sees only `team_a`, Team B sees only `team_b`, Management sees all rows. | Tested with 2-3 reader users (one per role): each user sees only the permitted rows; Team A values match the Athena reference filtered on `team_a`. |
-| NFR-03 | Cost | Total AWS cost of the project stays at or below 50 USD per month. No QuickSight Pro users or Q topics (they add an account fee). | AWS Budgets alert configured at 20 USD; month-to-date cost in Cost Explorer ≤ 50 USD; resources deleted after testing. |
+| NFR-03 | Cost | Total AWS cost of the project stays at or below 50 USD per month. No QuickSight Pro users or Q topics (they add an account fee). | AWS Budgets alert configured at 20 USD; month-to-date cost in Cost Explorer ≤ 50 USD; resources deleted after testing. Pricing basis and cost estimate: `research/notes/aws-pricing-2026-11.md`. |
 | NFR-04 | Traceability | Every dashboard visual refers to a KPI ID; every KPI has one formula in the catalog and one Athena reference query. | Review shows 100 % of visuals mapped to a KPI ID. |
 | NFR-05 | Data protection | Only synthetic data; no personal data and no secrets in the repository. | The generator uses no real names; the repository is checked for credentials before each commit. |
 
@@ -162,5 +162,6 @@ weeks, and the weekly KPI-03 might not show the breach in either of them.
   low volume. Incomplete edge periods are now excluded from target
   evaluation (see the general calculation rules in the KPI catalog).
 
-- AWS prices (S3, Glue, Athena, QuickSight incl. reader users for the RLS
-  test) are verified before the pipeline is built.
+- Resolved: AWS prices (S3, Glue, Athena, QuickSight incl. reader users for
+  the RLS test) were verified on 2026-11-24, see
+  `research/notes/aws-pricing-2026-11.md`.
