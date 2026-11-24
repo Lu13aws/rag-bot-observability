@@ -6,6 +6,8 @@ __pycache__/
 # Secrets and local config
 .env
 *.pem
+infra/config.env
+infra/.rendered/
 
 # Synthetic sample data: only one example day is committed.
 # Regenerate the full set with: python ingestion/generate_sample_logs.py

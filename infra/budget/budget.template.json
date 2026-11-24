@@ -1,0 +1,9 @@
+{
+  "BudgetName": "__PROJECT__-monthly",
+  "BudgetLimit": { "Amount": "__BUDGET_USD__", "Unit": "USD" },
+  "TimeUnit": "MONTHLY",
+  "BudgetType": "COST",
+  "CostFilters": {
+    "TagKeyValue": ["user:Project$__PROJECT__"]
+  }
+}

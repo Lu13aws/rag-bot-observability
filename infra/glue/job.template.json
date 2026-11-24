@@ -1,0 +1,21 @@
+{
+  "Role": "__ROLE_ARN__",
+  "Command": {
+    "Name": "glueetl",
+    "ScriptLocation": "s3://__BUCKET__/scripts/rag_query_log_json_to_parquet.py",
+    "PythonVersion": "3"
+  },
+  "DefaultArguments": {
+    "--job-language": "python",
+    "--job-bookmark-option": "job-bookmark-disable",
+    "--enable-continuous-cloudwatch-log": "true",
+    "--SOURCE_PATH": "s3://__BUCKET__/raw/rag_query_log/",
+    "--TARGET_PATH": "s3://__BUCKET__/processed/rag_query_log/"
+  },
+  "GlueVersion": "__GLUE_VERSION__",
+  "WorkerType": "G.1X",
+  "NumberOfWorkers": 2,
+  "Timeout": 10,
+  "MaxRetries": 0,
+  "ExecutionClass": "STANDARD"
+}

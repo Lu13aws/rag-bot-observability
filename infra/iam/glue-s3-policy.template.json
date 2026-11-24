@@ -1,0 +1,29 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "ListProjectPrefixes",
+      "Effect": "Allow",
+      "Action": "s3:ListBucket",
+      "Resource": "arn:aws:s3:::__BUCKET__",
+      "Condition": {
+        "StringLike": { "s3:prefix": ["raw/*", "processed/*", "scripts/*"] }
+      }
+    },
+    {
+      "Sid": "ReadRawAndScripts",
+      "Effect": "Allow",
+      "Action": "s3:GetObject",
+      "Resource": [
+        "arn:aws:s3:::__BUCKET__/raw/*",
+        "arn:aws:s3:::__BUCKET__/scripts/*"
+      ]
+    },
+    {
+      "Sid": "WriteProcessed",
+      "Effect": "Allow",
+      "Action": ["s3:GetObject", "s3:PutObject", "s3:DeleteObject"],
+      "Resource": "arn:aws:s3:::__BUCKET__/processed/*"
+    }
+  ]
+}
