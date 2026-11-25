@@ -86,4 +86,4 @@ local validator (`ingestion/validate_sample_logs.py`).
 |---|---|---|---|
 | 2026-11-24 | First version: KPI-01 to KPI-07 with formulas, targets, calculation rules and acceptance tolerances (incl. KPI-02 alternative ±0.2 percentage points); KPI-04 minimum of 30 rated queries | Initial definition | `eba89ef` |
 | 2026-11-24 | KPI-02 minimum of 200 queries; rule "Incomplete edge periods" | Random target breaches on low-volume days and in the partial first ISO week | `04cbe13` |
-| 2026-11-25 | KPI-01 minimum of 100 successful queries (assumption); minimum sample sizes apply to every selection incl. dimension filters | p95 from small samples is not reliable (weekends, single-team selections) | not yet committed |
+| 2026-11-25 | KPI-01 minimum of 100 successful queries (assumption); minimum sample sizes apply to every selection incl. dimension filters | p95 from small samples is not reliable (weekends, single-team selections) | `7db7ef5` |
