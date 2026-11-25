@@ -44,6 +44,36 @@ run() {
   "$@"
 }
 
+ATHENA_WG="${PROJECT}"
+
+# athena_run <sql-file>: render, run in the project workgroup, wait, print
+# state, scanned bytes and run time; for files in sql/checks/ also the result.
+athena_run() {
+  local file="$1" rendered="$RENDER_DIR/$(basename "$1")"
+  render "$file" "$rendered"
+  echo "== $file"
+  local id
+  id="$(run aws athena start-query-execution --work-group "$ATHENA_WG" \
+        --query-execution-context "Database=$GLUE_DATABASE" \
+        --query-string "file://$rendered" --query QueryExecutionId --output text | tail -n 1)"
+  [[ "$DRY_RUN" == "1" ]] && return 0
+  local state
+  while true; do
+    state="$(aws athena get-query-execution --query-execution-id "$id" \
+             --query QueryExecution.Status.State --output text)"
+    case "$state" in SUCCEEDED|FAILED|CANCELLED) break ;; esac
+    sleep 2
+  done
+  aws athena get-query-execution --query-execution-id "$id" --output text \
+    --query 'QueryExecution.[Status.State,Statistics.DataScannedInBytes,Statistics.TotalExecutionTimeInMillis,Status.StateChangeReason]' \
+    | awk -F'\t' '{printf "   state=%s scanned_bytes=%s time_ms=%s %s\n", $1, $2, $3, ($4 == "None" ? "" : $4)}'
+  [[ "$state" == "SUCCEEDED" ]] || return 1
+  if [[ "$file" == sql/checks/* ]]; then
+    aws athena get-query-results --query-execution-id "$id" --output text \
+      --query 'ResultSet.Rows[].Data[].VarCharValue' | sed 's/^/   /'
+  fi
+}
+
 account_id() {
   aws sts get-caller-identity --query Account --output text
 }
