@@ -59,9 +59,13 @@ checked by `ingestion/validate_sample_logs.py`.
 
 ### 5.1 Data model
 
-Status: the raw layer (JSON Lines, one folder per `dt`) and `model_pricing`
-(CSV) are implemented in `sample-data/`. The Parquet layer is not yet
-implemented.
+Status: implemented.
+- Raw layer: JSON Lines, one folder per `dt`, and `model_pricing` (CSV), in
+  `sample-data/` and in S3.
+- Parquet layer: written by the Glue job
+  (`glue/rag_query_log_json_to_parquet.py`).
+- Athena tables (`sql/`) and KPI reference views (`sql/views/`), verified
+  against the local validator with `ingestion/compare_kpis.py`.
 
 Table `rag_query_log`: one row per query. Parquet/Snappy, Hive-partitioned
 by `dt`.
