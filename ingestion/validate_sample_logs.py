@@ -166,6 +166,7 @@ def kpis(rows: list[dict], pricing: dict) -> dict:
         "KPI-06": ratio(sum(query_cost(r, pricing) for r in rows), len(rows)) if rows else None,
         "KPI-07": len(rows),
         "_rated": len(rated),
+        "_successful": len(success),
     }
 
 
@@ -222,6 +223,8 @@ def report_kpis(rows: list[dict], pricing: dict) -> None:
             value = values[kpi_id]
             if value is None:
                 continue
+            if kpi_id == "KPI-01" and values["_successful"] < 100:
+                continue  # not evaluated below 100 successful queries (assumption)
             if kpi_id == "KPI-02" and values["KPI-07"] < 200:
                 continue  # not evaluated below 200 queries
             if kpi_id == "KPI-04" and values["_rated"] < 30:
